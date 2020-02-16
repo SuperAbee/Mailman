@@ -1,0 +1,154 @@
+package com.saviour.mailman.encoder;
+
+import com.saviour.mailman.tool.FFmpegUtil;
+import com.saviour.mailman.tool.FormatTransfer;
+import com.saviour.mailman.tool.Parameter;
+import com.saviour.mailman.tool.PictureUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import static java.lang.Thread.sleep;
+
+/**
+ * @author xincong yao
+ * The encoder accept byte to be encoded, video path and video length as a input.
+ * Generate a video as a output and save it to the specific path.
+ */
+@Component
+public class SimpleVideoEncoder {
+
+    @Autowired
+    private PictureUtil pictureUtil;
+
+    @Autowired
+    private FFmpegUtil ffmpegUtil;
+
+    @Autowired
+    private FormatTransfer transfer;
+
+    /**
+     * bytes to be encoded
+     */
+    private byte[] srcByte;
+
+    /**
+     * path to save encoded video
+     */
+    private String path;
+
+    /**
+     * root of path
+     */
+    private String root;
+
+    /**
+     * unit: millisecond
+     */
+    private Integer lengthOfVideo;
+
+    /**
+     * frame per second
+     */
+    private Integer fps;
+
+    /**
+     * the prefix of temperate pictures
+     */
+    private static final String PICTUREPREFIX = "tmp";
+
+
+    public void load(byte[] srcByte, Integer lengthOfVideo, String path){
+        this.srcByte = srcByte;
+        this.lengthOfVideo = lengthOfVideo;
+        this.path = path;
+        int index = path.lastIndexOf("/");
+        this.root = path.substring(0, index);
+        this.fps = (int) Math.ceil((8 * (4 + 4 + 4 + srcByte.length))/
+                (Parameter.VIDEOHEIGHT.getValue() * Parameter.VIDEOWIDTH.getValue() * Math.ceil(lengthOfVideo/1000.0)));
+    }
+
+    public String encode(){
+        /**
+         * The size of bytes bigger than 1MB, switch to fast mode
+         */
+        if(srcByte.length >= 1024 * 1024){
+            return fastEncode();
+        }
+
+        /**
+         * step1: bytes -> bits
+         */
+        Boolean[] bits = SVCP();
+
+        /**
+         * step2: bits -> generate pictures
+         */
+        int pictureNumber = calculatePictureNumber();
+        pictureUtil.generatePictures(bits, pictureNumber, root, PICTUREPREFIX);
+
+        /**
+         * step3: pictures -> video
+         */
+        ffmpegUtil.generateVideo(path, fps);
+
+        /**
+         * step4: remove pictures
+         */
+        try {
+            /**
+             * This thread sleep 10ms per pictureNumber to delete pictures,
+             * so that ffmpeg has enough time to combine videos.
+             */
+            sleep(10 * pictureNumber);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        pictureUtil.deletePictures(root, PICTUREPREFIX);
+
+        return "OK";
+    }
+
+    private String fastEncode(){
+        return "OK";
+    }
+
+    /**
+     * implement the protocol of encoder
+     */
+    private Boolean[] SVCP(){
+        /**
+         * Simple Video Code Protocol:
+         * 4            : start flag
+         * 4            : fps
+         * 4            : body length
+         * bytes.length : body
+         */
+
+        Boolean[] bitsOfStartFlag = transfer.int2Bit(Parameter.STARTFLAG.getValue());
+        Boolean[] bitsOfBody = transfer.byte2Bit(srcByte);
+        Boolean[] bitsOfBodyLength = transfer.int2Bit(bitsOfBody.length);
+
+        /**
+         * ceil, otherwise the duration of video is too short
+         */
+        Boolean[] bitsOfFPS = transfer.int2Bit(fps);
+
+        /**
+         * contact all bits
+         */
+        Boolean[] result = new Boolean[bitsOfStartFlag.length
+                + bitsOfFPS.length
+                + bitsOfBodyLength.length
+                + bitsOfBody.length];
+        System.arraycopy(bitsOfStartFlag, 0, result, 0, bitsOfStartFlag.length);
+        System.arraycopy(bitsOfFPS, 0, result, bitsOfFPS.length, bitsOfFPS.length);
+        System.arraycopy(bitsOfBodyLength, 0, result, bitsOfStartFlag.length + bitsOfFPS.length, bitsOfBodyLength.length);
+        System.arraycopy(bitsOfBody, 0, result, bitsOfStartFlag.length + bitsOfFPS.length + bitsOfBodyLength.length, bitsOfBody.length);
+
+        return result;
+    }
+
+    private int calculatePictureNumber(){
+        return (int) (fps * Math.ceil(lengthOfVideo/1000.0));
+    }
+}
