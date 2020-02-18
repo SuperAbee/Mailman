@@ -7,6 +7,8 @@ import com.saviour.mailman.tool.PictureUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.awt.image.BufferedImage;
+
 import static java.lang.Thread.sleep;
 
 /**
@@ -118,9 +120,9 @@ public class SimpleVideoEncoder {
     private Boolean[] SVCP(){
         /**
          * Simple Video Code Protocol:
-         * 4            : start flag
-         * 4            : fps
-         * 4            : body length
+         * 4B           : start flag
+         * 4B           : fps
+         * 4B           : body length
          * bytes.length : body
          */
 

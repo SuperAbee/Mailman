@@ -36,7 +36,7 @@ public class PictureUtil {
                 }
             }
 
-            save(images[i], root, prefix + i);
+            save(images[i], root, prefix + (i + 1));
 
         }
     }
@@ -50,8 +50,15 @@ public class PictureUtil {
         }
     }
 
+    public int calGray(int pixel){
+        int r = (pixel & 0xff0000) >> 16;
+        int g = (pixel & 0xff00) >> 8;
+        int b = (pixel & 0xff);
+        return (r + g +b) / 3;
+    }
+
     public void deletePictures(String root, String prefix) {
-        for(int i = 0; ; i++){
+        for(int i = 1; ; i++){
             File image = new File(root + File.separator + prefix + i + ".jpg");
             if(image.exists()){
                 image.delete();

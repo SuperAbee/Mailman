@@ -38,4 +38,16 @@ public class FormatTransfer {
     public Boolean[] int2Bit(int val){
         return byte2Bit(int2Byte(val));
     }
+
+    public int bit2Int(Boolean[] bits) {
+
+        int res = 0;
+        for(int i = 0; i < bits.length; i++){
+            if(bits[i]){
+                res += Math.pow(2, i);
+            }
+        }
+        return res;
+    }
+
 }

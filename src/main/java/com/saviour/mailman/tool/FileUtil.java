@@ -126,9 +126,11 @@ public class FileUtil {
 
     public File multiPartFile2File(MultipartFile multipartFile){
         File f = new File(multipartFile.getOriginalFilename());
+        InputStream in = null;
+        OutputStream os = null;
         try {
-            InputStream in  = multipartFile.getInputStream();
-            OutputStream os = new FileOutputStream(f);
+            in  = multipartFile.getInputStream();
+            os = new FileOutputStream(f);
 
             byte[] buffer = new byte[4096];
             int len;
@@ -160,5 +162,12 @@ public class FileUtil {
         }
 
         return "ERROR";
+    }
+
+    public void delete(String path){
+        File file = new File(path);
+        if(file.exists()){
+            file.delete();
+        }
     }
 }
