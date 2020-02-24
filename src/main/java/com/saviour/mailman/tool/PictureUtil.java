@@ -12,7 +12,6 @@ import java.io.IOException;
 public class PictureUtil {
 
     public void generatePictures(Boolean[] bits, int num, String root, String prefix) {
-
         BufferedImage[] images = new BufferedImage[num];
 
         int counter = 0;

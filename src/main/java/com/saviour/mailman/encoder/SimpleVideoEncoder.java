@@ -31,27 +31,27 @@ public class SimpleVideoEncoder {
     /**
      * bytes to be encoded
      */
-    private byte[] srcByte;
+    protected byte[] srcByte;
 
     /**
      * path to save encoded video
      */
-    private String path;
+    protected String path;
 
     /**
      * root of path
      */
-    private String root;
+    protected String root;
 
     /**
      * unit: millisecond
      */
-    private Integer lengthOfVideo;
+    protected Integer lengthOfVideo;
 
     /**
      * frame per second
      */
-    private Integer fps;
+    protected Integer fps;
 
     /**
      * the prefix of temperate pictures
@@ -69,11 +69,11 @@ public class SimpleVideoEncoder {
                 (Parameter.VIDEOHEIGHT.getValue() * Parameter.VIDEOWIDTH.getValue() * Math.ceil(lengthOfVideo/1000.0)));
     }
 
-    public String encode(){
+    public String encode() throws Exception {
         /**
-         * The size of bytes bigger than 1MB, switch to fast mode
+         * The size of bytes bigger than 10MB, switch to fast mode
          */
-        if(srcByte.length >= 1024 * 1024){
+        if(srcByte.length >= 1024 * 1024 * 10){
             return fastEncode();
         }
 
@@ -110,14 +110,14 @@ public class SimpleVideoEncoder {
         return "OK";
     }
 
-    private String fastEncode(){
+    protected String fastEncode(){
         return "OK";
     }
 
     /**
      * implement the protocol of encoder
      */
-    private Boolean[] SVCP(){
+    protected Boolean[] SVCP(){
         /**
          * Simple Video Code Protocol:
          * 4B           : start flag
@@ -150,7 +150,7 @@ public class SimpleVideoEncoder {
         return result;
     }
 
-    private int calculatePictureNumber(){
+    protected int calculatePictureNumber(){
         return (int) (fps * Math.ceil(lengthOfVideo/1000.0));
     }
 }

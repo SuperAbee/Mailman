@@ -6,6 +6,7 @@ import com.saviour.mailman.tool.FFmpegUtil;
 import com.saviour.mailman.tool.FileUtil;
 import com.saviour.mailman.tool.PictureUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,9 +21,11 @@ public class CoderController {
     @Autowired
     private FileUtil fileUtil;
 
+    @Qualifier("qrBasedVideoEncoder")
     @Autowired
     private SimpleVideoEncoder encoder;
 
+    @Qualifier("qrBasedVideoDecoder")
     @Autowired
     private SimpleVideoDecoder decoder;
 
@@ -34,7 +37,7 @@ public class CoderController {
     @RequestMapping("/encode")
     public ModelAndView encode(@RequestParam("file") MultipartFile srcFile,
                                @RequestParam("path") String path,
-                               @RequestParam("length") int lengthOfVideo) {
+                               @RequestParam("length") int lengthOfVideo) throws Exception {
         /**
          * step1: preparation
          */
@@ -61,7 +64,7 @@ public class CoderController {
 
     @RequestMapping("/decode")
     public ModelAndView decode(@RequestParam("file") MultipartFile srcFile,
-                               @RequestParam("path") String path){
+                               @RequestParam("path") String path) throws Exception {
         /**
          * step1: initialize decoder
          */

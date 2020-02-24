@@ -29,30 +29,25 @@ public class SimpleVideoDecoder {
     @Autowired
     private FormatTransfer transfer;
 
-    private File file;
+    protected File file;
 
-    /**
-     * root + filename
-     */
-    private String path;
 
     /**
      * The root path work place
      */
-    private String root;
+    protected String root;
 
-    private static final String VIDEONAME = "tmp.mp4";
-    private static final String PICTUREPREFIX = "tmp";
-    private static final int ORIGINALFPS = 2;
+    protected static final String VIDEONAME = "tmp.mp4";
+    protected static final String PICTUREPREFIX = "tmp";
+    protected static final int ORIGINALFPS = 2;
 
     public void load(File file, String path) {
         this.file = file;
-        this.path = path;
         int index = path.lastIndexOf("/");
         this.root = path.substring(0, index);
     }
 
-    public byte[] decode() {
+    public byte[] decode() throws Exception {
         /*
          * step1: save video to local
          *
@@ -66,7 +61,7 @@ public class SimpleVideoDecoder {
         /*
          * step2: video -> picture
          */
-        ffmpegUtil.generatePictures(tmpVideoPath, PICTUREPREFIX, ORIGINALFPS);
+        ffmpegUtil.generatePictures(tmpVideoPath, PICTUREPREFIX);
 
         /*
          * step3: parse header
@@ -93,7 +88,7 @@ public class SimpleVideoDecoder {
         if(fps > 100){
             return null;
         }
-        ffmpegUtil.generatePictures(tmpVideoPath, PICTUREPREFIX, fps);
+        ffmpegUtil.generatePictures(tmpVideoPath, PICTUREPREFIX);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -130,7 +125,7 @@ public class SimpleVideoDecoder {
         return res;
     }
 
-    private Boolean[] getBitsFromPictures(String root, String prefix) {
+    protected Boolean[] getBitsFromPictures(String root, String prefix) {
         Boolean[] res = null;
         File tempFile;
         for(int i = 0; ; i++){

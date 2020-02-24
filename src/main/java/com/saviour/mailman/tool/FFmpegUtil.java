@@ -30,14 +30,12 @@ public class FFmpegUtil {
         }
     }
 
-    public void generatePictures(String path, String prefix, int fps) {
+    public void generatePictures(String path, String prefix) {
         int index = path.lastIndexOf("/");
         String root = path.substring(0, index);
 
         List<String> commend = new ArrayList<String>();
         commend.add("ffmpeg");
-        commend.add("-r");
-        commend.add(String.valueOf(fps));
         commend.add("-i");
         commend.add(path);
         commend.add(root + "/" + prefix + "%d.jpg");
