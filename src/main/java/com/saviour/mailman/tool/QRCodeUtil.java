@@ -302,7 +302,7 @@ public class QRCodeUtil {
                     true);
         }
         if(message.length() % maxLen != 0){
-            encode(message.substring(maxLen * numOfPictures),
+            encode(message.substring(maxLen * (numOfPictures - 1)),
                     root + File.separator + prefix + numOfPictures + ".jpg");
         }
     }

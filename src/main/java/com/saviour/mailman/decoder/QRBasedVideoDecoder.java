@@ -27,7 +27,7 @@ public class QRBasedVideoDecoder extends SimpleVideoDecoder {
     /**
      * the same with QRBasedVideoEncoder
      */
-    private static final int FPS = 5;
+    private static final int FPS = 10;
 
     @Override
     public byte[] decode() throws Exception {
@@ -58,7 +58,7 @@ public class QRBasedVideoDecoder extends SimpleVideoDecoder {
         /*
          * step4: delete temperate files and pictures
          */
-        //pictureUtil.deletePictures(root, PICTUREPREFIX);
+        pictureUtil.deletePictures(root, PICTUREPREFIX);
         fileUtil.delete(tmpVideoPath);
         return message;
     }
