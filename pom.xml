@@ -12,7 +12,7 @@
     <artifactId>mailman</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>mailman</name>
-    <description>A message transfer based on light</description>
+    <description>A message transmitter based on light</description>
 
     <properties>
         <java.version>1.8</java.version>
