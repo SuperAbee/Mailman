@@ -7,8 +7,6 @@ import com.saviour.mailman.tool.PictureUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.awt.image.BufferedImage;
-
 import static java.lang.Thread.sleep;
 
 /**
@@ -91,7 +89,7 @@ public class SimpleVideoEncoder {
         /**
          * step3: pictures -> video
          */
-        ffmpegUtil.generateVideo(path, fps);
+        ffmpegUtil.generateVideo(path, fps, "tmp");
 
         /**
          * step4: remove pictures

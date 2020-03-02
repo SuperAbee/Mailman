@@ -11,7 +11,7 @@ public class QRBasedVideoEncoder extends SimpleVideoEncoder {
 
     private static final String PICTUREPREFIX = "tmp";
     private static final int FPS = 10;
-    private static final int MAXLEN = 40;
+    private static final int MAXLEN = 80;
 
     @Autowired
     private QRCodeUtil qrCodeUtil;
@@ -39,7 +39,7 @@ public class QRBasedVideoEncoder extends SimpleVideoEncoder {
         /**
          * step2: pictures -> video
          */
-        ffmpegUtil.generateVideo(path, FPS);
+        ffmpegUtil.generateVideo(path, FPS, "tmp");
 
         /**
          * step3: remove pictures

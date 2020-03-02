@@ -293,8 +293,6 @@ public class QRCodeUtil {
         protocol is implemented here.
          */
         int numOfPictures =  ((message.length() + 1) / maxLen + 1);
-        message = numOfPictures + message;
-        message = "111" + message;
 
         for (int i = 0; i < numOfPictures - 1; i++) {
             encode(message.substring(i * maxLen, (i + 1) * maxLen),
@@ -308,8 +306,8 @@ public class QRCodeUtil {
     }
 
     public byte[] getBytesFromPictures(String root, String prefix, int startFrame, int duration, int num) throws Exception {
-        File tempFile = new File(root + File.separator + prefix + startFrame + ".jpg");
-        String res = decode(tempFile).substring(5);
+        File tempFile = null;
+        String res = "";
 
         for(int i = startFrame + duration, counter = 1; ; i+=duration, counter++){
             if(counter > num - 1){

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Component
 public class FFmpegUtil {
-    public void generateVideo(String path, int fps) {
+    public void generateVideo(String path, int fps, String imagePrefix) {
         int index = path.lastIndexOf("/");
         String root = path.substring(0, index);
 
@@ -18,7 +18,7 @@ public class FFmpegUtil {
         commend.add("-r");
         commend.add(String.valueOf(fps));
         commend.add("-i");
-        commend.add(root + "/tmp%d.jpg");
+        commend.add(root + "/" + imagePrefix + "%d.jpg");
         commend.add(path);
 
         ProcessBuilder builder = new ProcessBuilder();

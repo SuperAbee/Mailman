@@ -21,11 +21,11 @@ public class CoderController {
     @Autowired
     private FileUtil fileUtil;
 
-    @Qualifier("qrBasedVideoEncoder")
+    @Qualifier("orcBasedVideoEncoder")
     @Autowired
     private SimpleVideoEncoder encoder;
 
-    @Qualifier("qrBasedVideoDecoder")
+    @Qualifier("orcBasedVideoDecoder")
     @Autowired
     private SimpleVideoDecoder decoder;
 
