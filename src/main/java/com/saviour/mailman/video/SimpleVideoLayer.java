@@ -103,10 +103,18 @@ public class SimpleVideoLayer {
 
         ITesseract instance = new Tesseract();
 
-        String path = this.getClass().getResource("/tessdata").getPath();
+        String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+        // Run jar: file:/D:/Serious/Courses/Computer%20Networking/Mailman/target/mailman-0.0.1-SNAPSHOT.jar!/BOOT-INF/classes!/
+        path = path.substring(1);
+
+        String[] dir = path.split("mailman-.+-SNAPSHOT\\.jar");
+        if (dir.length == 2) {
+            path = dir[0].substring(5);
+        }
+        path = path + "tessdata";
         try {
-            path = path.substring(1);
             path = URLDecoder.decode(path, "UTF-8");
+            System.out.println(path);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -167,9 +175,13 @@ public class SimpleVideoLayer {
     public static void main(String[] args) {
         SimpleVideoLayer videoLayer = new SimpleVideoLayer();
         //videoLayer.generateFirstFrame(10, 100, "D:/OTHER/test4cn", "logo");
-        Map<String, Integer> res = videoLayer.detectFirstFrame("D:/OTHER/test4cn", "logo");
-        System.out.println("fps: "  + res.get("fps") + "  "
-                + "frames: " + res.get("frames") + "  "
-                + "firstFrame: " + res.get("firstFrame"));
+        //Map<String, Integer> res = videoLayer.detectFirstFrame("D:/OTHER/test4cn", "logo");
+        //System.out.println("fps: "  + res.get("fps") + "  "
+        //       + "frames: " + res.get("frames") + "  "
+        //        + "firstFrame: " + res.get("firstFrame"));
+        //String path = "/D:/Serious/Courses/Computer%20Networking/Mailman/target/mailman-0.0.1-SNAPSHOT.jar!/BOOT-INF/classes!/";
+        String path = videoLayer.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+        String[] dir = path.split("/mailman-.+-SNAPSHOT\\.jar");
+        System.out.println(dir[0]);
     }
 }
