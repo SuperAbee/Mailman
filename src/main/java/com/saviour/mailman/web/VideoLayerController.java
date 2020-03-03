@@ -4,13 +4,13 @@ import com.saviour.mailman.tool.FFmpegUtil;
 import com.saviour.mailman.tool.PictureUtil;
 import com.saviour.mailman.video.SimpleVideoLayer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.SimpleFormatter;
 
 @RestController
 public class VideoLayerController {
@@ -28,11 +28,13 @@ public class VideoLayerController {
      * @return status
      */
     @RequestMapping("/video/compose")
-    public ModelAndView compose(int fps, int numOfPictures, String workplace, String imagePrefix, Boolean deleteImages) {
+    public String compose(int fps, int numOfPictures,
+                                String workplace, String imagePrefix,
+                                Boolean deleteImages) {
 
-        videoLayer.compose(fps, numOfPictures, workplace, imagePrefix, deleteImages);
+        String result = videoLayer.compose(fps, numOfPictures, workplace, imagePrefix, deleteImages);
 
-        return new ModelAndView();
+        return result;
     }
 
     /**
@@ -43,12 +45,11 @@ public class VideoLayerController {
      * @return fps, frames, first frame.
      */
     @RequestMapping("/video/decompose")
-    public ModelAndView decompose(String workplace, String imagePrefix, String videoName){
+    public String decompose(String workplace, String imagePrefix, String videoName){
 
         Map<String, Integer> result = videoLayer.decompose(workplace, imagePrefix, videoName);
 
-        ModelAndView mav = new ModelAndView("status.html");
-        mav.addObject("result", result);
-        return mav;
+        return "First Frame: " + result.get("firstFrame") + "; Frames: " + result.get("frames") +
+                "; FPS: " + result.get("fps");
     }
 }

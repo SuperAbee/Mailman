@@ -45,7 +45,8 @@ public class SimpleVideoLayer {
     }
 
     private String generateFirstFrame(int flag, int numOfPictures, String workplace, String imagePrefix) {
-        String strFlag = numOfPictures + " frames with " + flag + "fps";
+        // with 1 plus head frame
+        String strFlag = (numOfPictures + 1) + " frames with " + flag + "fps";
         BufferedImage tempImage;
         try {
             tempImage = ImageIO.read(new File(workplace + File.separator + imagePrefix + "1.jpg"));
@@ -114,7 +115,7 @@ public class SimpleVideoLayer {
         path = path + "tessdata";
         try {
             path = URLDecoder.decode(path, "UTF-8");
-            System.out.println(path);
+            //System.out.println(path);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

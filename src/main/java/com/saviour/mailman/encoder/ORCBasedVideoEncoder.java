@@ -42,8 +42,7 @@ public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
         /**
          * step2: pictures -> video
          */
-        // data frames with head frame
-        int numOfPictures =  ((new String(srcByte).length() + 1) / MAXLEN + 1) + 1;
+        int numOfPictures =  ((new String(srcByte).length() + 1) / MAXLEN + 1);
         videoLayer.compose(FPS, numOfPictures, root, PICTUREPREFIX, false);
 
         /**
@@ -58,7 +57,7 @@ public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        pictureUtil.deletePictures(root, PICTUREPREFIX);
+        //pictureUtil.deletePictures(root, PICTUREPREFIX);
 
         return "OK";
     }

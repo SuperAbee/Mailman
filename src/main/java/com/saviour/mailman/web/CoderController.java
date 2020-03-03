@@ -2,9 +2,7 @@ package com.saviour.mailman.web;
 
 import com.saviour.mailman.decoder.SimpleVideoDecoder;
 import com.saviour.mailman.encoder.SimpleVideoEncoder;
-import com.saviour.mailman.tool.FFmpegUtil;
 import com.saviour.mailman.tool.FileUtil;
-import com.saviour.mailman.tool.PictureUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
