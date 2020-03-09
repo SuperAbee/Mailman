@@ -123,7 +123,7 @@ public class SimpleVideoLayer {
         instance.setDatapath(path);
         instance.setLanguage("eng");
         long startTime = System.currentTimeMillis();
-        for (int i = 1; i < 30; i++) {
+        for (int i = 1; i < 60; i++) {
             File file = new File(workplace + File.separator + imagePrefix + i + ".jpg");
             String result = null;
             try {
@@ -132,8 +132,17 @@ public class SimpleVideoLayer {
                 e.printStackTrace();
             }
 
-            String[] values = result.split(" frames with ");
-            if(values.length > 1){
+            String[] t = result.split(" frames with ");
+            if(t.length > 1){
+                t = result.split("[0-9]+ frames with .+fps");
+                if(t.length == 1) {
+                    result = result.substring(0, result.indexOf(t[0]));
+                } else {
+                    result = result.substring(t[0].length(), result.indexOf(t[1]));
+                }
+
+                String[] values = result.split(" frames with ");
+
                 long endTime = System.currentTimeMillis();
                 /*
                  * example: 100 frames with 10fps
@@ -147,6 +156,9 @@ public class SimpleVideoLayer {
                     if(frames[j] == 79 || frames[j] == 111){
                         frames[j] = 48;
                     }
+                    if(frames[j] == 83 || frames[j] == 115){
+                        frames[j] = 53;
+                    }
                 }
                 for (int j = 0; j < fps.length; j++) {
                     if(fps[j] == 73 || fps[j] == 108){
@@ -154,6 +166,9 @@ public class SimpleVideoLayer {
                     }
                     if(fps[j] == 79 || fps[j] == 111){
                         fps[j] = 48;
+                    }
+                    if(fps[j] == 83 || fps[j] == 115){
+                        fps[j] = 53;
                     }
                 }
                 String strFPS = new String(fps);
@@ -181,8 +196,14 @@ public class SimpleVideoLayer {
         //       + "frames: " + res.get("frames") + "  "
         //        + "firstFrame: " + res.get("firstFrame"));
         //String path = "/D:/Serious/Courses/Computer%20Networking/Mailman/target/mailman-0.0.1-SNAPSHOT.jar!/BOOT-INF/classes!/";
-        String path = videoLayer.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-        String[] dir = path.split("/mailman-.+-SNAPSHOT\\.jar");
-        System.out.println(dir[0]);
+        String result = "----\n20 frames with 5fps";
+        String[] t = result.split("[0-9]+ frames with ");
+
+        result = result.substring(t[0].length(), result.indexOf(t[1]));
+        System.out.println(result);
+        for (String s:
+             t) {
+            System.out.print(s);
+        }
     }
 }

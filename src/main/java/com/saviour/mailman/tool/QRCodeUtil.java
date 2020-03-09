@@ -319,7 +319,7 @@ public class QRCodeUtil {
                 try {
                     temp = decode(tempFile);
                     res = res + temp;
-                    System.out.println("Frame" + i + " with message: " + temp);
+                    System.out.println("Frame " + i + " with message: " + temp);
                 } catch (Exception e){
                     System.out.println("Frame " + i + " lose");
                 }

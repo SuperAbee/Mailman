@@ -1,10 +1,8 @@
 package com.saviour.mailman.encoder;
 
-import com.saviour.mailman.tool.FFmpegUtil;
 import com.saviour.mailman.tool.PictureUtil;
 import com.saviour.mailman.tool.QRCodeUtil;
 import com.saviour.mailman.video.SimpleVideoLayer;
-import com.saviour.mailman.web.VideoLayerController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +11,6 @@ import static java.lang.Thread.sleep;
 @Component("orcBasedVideoEncoder")
 public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
     private static final String PICTUREPREFIX = "tmp";
-    private static final int FPS = 10;
     private static final int MAXLEN = 80;
 
     @Autowired
@@ -43,7 +40,7 @@ public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
          * step2: pictures -> video
          */
         int numOfPictures =  ((new String(srcByte).length() + 1) / MAXLEN + 1);
-        videoLayer.compose(FPS, numOfPictures, root, PICTUREPREFIX, false);
+        videoLayer.compose(fps, numOfPictures, root, PICTUREPREFIX, false);
 
         /**
          * step3: remove pictures
@@ -57,7 +54,7 @@ public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //pictureUtil.deletePictures(root, PICTUREPREFIX);
+        pictureUtil.deletePictures(root, PICTUREPREFIX);
 
         return "OK";
     }

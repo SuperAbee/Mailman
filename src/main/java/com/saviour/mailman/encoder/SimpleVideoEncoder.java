@@ -26,6 +26,8 @@ public class SimpleVideoEncoder {
     @Autowired
     private FormatTransfer transfer;
 
+    private static final int MAXLEN = 80 * 80;
+
     /**
      * bytes to be encoded
      */
@@ -42,11 +44,6 @@ public class SimpleVideoEncoder {
     protected String root;
 
     /**
-     * unit: millisecond
-     */
-    protected Integer lengthOfVideo;
-
-    /**
      * frame per second
      */
     protected Integer fps;
@@ -57,14 +54,12 @@ public class SimpleVideoEncoder {
     private static final String PICTUREPREFIX = "tmp";
 
 
-    public void load(byte[] srcByte, Integer lengthOfVideo, String path){
+    public void load(byte[] srcByte, Integer fps, String path){
         this.srcByte = srcByte;
-        this.lengthOfVideo = lengthOfVideo;
         this.path = path;
         int index = path.lastIndexOf("/");
         this.root = path.substring(0, index);
-        this.fps = (int) Math.ceil((8 * (4 + 4 + 4 + srcByte.length))/
-                (Parameter.VIDEOHEIGHT.getValue() * Parameter.VIDEOWIDTH.getValue() * Math.ceil(lengthOfVideo/1000.0)));
+        this.fps = fps;
     }
 
     public String encode() throws Exception {
@@ -83,8 +78,8 @@ public class SimpleVideoEncoder {
         /**
          * step2: bits -> generate pictures
          */
-        int pictureNumber = calculatePictureNumber();
-        pictureUtil.generatePictures(bits, pictureNumber, root, PICTUREPREFIX);
+        int numOfPictures =  ((new String(srcByte).length() + 1) / MAXLEN + 1);
+        pictureUtil.generatePictures(bits, numOfPictures, root, PICTUREPREFIX);
 
         /**
          * step3: pictures -> video
@@ -99,7 +94,7 @@ public class SimpleVideoEncoder {
              * This thread sleep 10ms per pictureNumber to delete pictures,
              * so that ffmpeg has enough time to combine videos.
              */
-            sleep(10 * pictureNumber);
+            sleep(10 * numOfPictures);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -146,9 +141,5 @@ public class SimpleVideoEncoder {
         System.arraycopy(bitsOfBody, 0, result, bitsOfStartFlag.length + bitsOfFPS.length + bitsOfBodyLength.length, bitsOfBody.length);
 
         return result;
-    }
-
-    protected int calculatePictureNumber(){
-        return (int) (fps * Math.ceil(lengthOfVideo/1000.0));
     }
 }

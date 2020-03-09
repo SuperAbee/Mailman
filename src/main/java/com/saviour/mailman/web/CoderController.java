@@ -35,7 +35,7 @@ public class CoderController {
     @RequestMapping("/encode")
     public ModelAndView encode(@RequestParam("file") MultipartFile srcFile,
                                @RequestParam("path") String path,
-                               @RequestParam("length") int lengthOfVideo) throws Exception {
+                               @RequestParam("fps") int fps) throws Exception {
         /**
          * step1: preparation
          */
@@ -45,7 +45,7 @@ public class CoderController {
         /**
          * step2: initialize encoder
          */
-        encoder.load(bytes, lengthOfVideo, path);
+        encoder.load(bytes, fps, path);
 
         /**
          * step3: encode

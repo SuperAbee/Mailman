@@ -10,7 +10,6 @@ import static java.lang.Thread.sleep;
 public class QRBasedVideoEncoder extends SimpleVideoEncoder {
 
     private static final String PICTUREPREFIX = "tmp";
-    private static final int FPS = 10;
     private static final int MAXLEN = 80;
 
     @Autowired
@@ -39,7 +38,7 @@ public class QRBasedVideoEncoder extends SimpleVideoEncoder {
         /**
          * step2: pictures -> video
          */
-        ffmpegUtil.generateVideo(path, FPS, "tmp");
+        ffmpegUtil.generateVideo(path, fps, "tmp");
 
         /**
          * step3: remove pictures
