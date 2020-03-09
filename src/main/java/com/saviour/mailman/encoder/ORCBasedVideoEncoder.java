@@ -11,7 +11,7 @@ import static java.lang.Thread.sleep;
 @Component("orcBasedVideoEncoder")
 public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
     private static final String PICTUREPREFIX = "tmp";
-    private static final int MAXLEN = 80;
+    private static final int MAXLEN = 500;
 
     @Autowired
     private QRCodeUtil qrCodeUtil;

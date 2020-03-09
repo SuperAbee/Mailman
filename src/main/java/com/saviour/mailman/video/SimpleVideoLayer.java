@@ -88,7 +88,7 @@ public class SimpleVideoLayer {
         String path = workplace + '/' + videoName;
         ffmpegUtil.generatePictures(path, imagePrefix);
         try {
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -115,7 +115,6 @@ public class SimpleVideoLayer {
         path = path + "tessdata";
         try {
             path = URLDecoder.decode(path, "UTF-8");
-            //System.out.println(path);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -124,6 +123,7 @@ public class SimpleVideoLayer {
         instance.setLanguage("eng");
         long startTime = System.currentTimeMillis();
         for (int i = 1; i < 60; i++) {
+
             File file = new File(workplace + File.separator + imagePrefix + i + ".jpg");
             String result = null;
             try {
@@ -184,6 +184,7 @@ public class SimpleVideoLayer {
                 return table;
             }
         }
+        System.out.println("First frame not found.");
 
         return table;
     }
