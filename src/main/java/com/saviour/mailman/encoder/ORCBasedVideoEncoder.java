@@ -11,7 +11,6 @@ import static java.lang.Thread.sleep;
 @Component("orcBasedVideoEncoder")
 public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
     private static final String PICTUREPREFIX = "tmp";
-    private static final int MAXLEN = 500;
 
     @Autowired
     private QRCodeUtil qrCodeUtil;
@@ -34,12 +33,12 @@ public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
         /**
          * step1: generate pictures
          */
-        qrCodeUtil.generatePictures(new String(srcByte), MAXLEN, root, PICTUREPREFIX);
+        qrCodeUtil.generatePictures(new String(srcByte), QRBasedVideoEncoder.MAXLEN, root, PICTUREPREFIX);
 
         /**
          * step2: pictures -> video
          */
-        int numOfPictures =  ((new String(srcByte).length() + 1) / MAXLEN + 1);
+        int numOfPictures =  ((new String(srcByte).length() + 1) / QRBasedVideoEncoder.MAXLEN + 1);
         videoLayer.compose(fps, numOfPictures, root, PICTUREPREFIX, false);
 
         /**

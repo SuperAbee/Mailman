@@ -10,7 +10,7 @@ import static java.lang.Thread.sleep;
 public class QRBasedVideoEncoder extends SimpleVideoEncoder {
 
     private static final String PICTUREPREFIX = "tmp";
-    private static final int MAXLEN = 80;
+    public static final int MAXLEN = 300;
 
     @Autowired
     private QRCodeUtil qrCodeUtil;

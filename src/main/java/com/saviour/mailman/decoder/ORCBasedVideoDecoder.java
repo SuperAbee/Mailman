@@ -53,7 +53,7 @@ public class ORCBasedVideoDecoder extends SimpleVideoDecoder {
         /*
          * step4: delete temperate files and pictures
          */
-        pictureUtil.deletePictures(root, PICTUREPREFIX);
+        //pictureUtil.deletePictures(root, PICTUREPREFIX);
         fileUtil.delete(tmpVideoPath);
         return message;
     }

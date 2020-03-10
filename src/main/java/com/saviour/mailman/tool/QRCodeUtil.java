@@ -43,6 +43,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.saviour.mailman.encoder.QRBasedVideoEncoder;
 import org.springframework.stereotype.Component;
 
 
@@ -55,7 +56,7 @@ public class QRCodeUtil {
 
     // 二维码尺寸
 
-    private static final int QRCODE_SIZE = 300;
+    private static final int QRCODE_SIZE = 500;
 
     // LOGO宽度
 
@@ -309,6 +310,7 @@ public class QRCodeUtil {
         File tempFile = null;
         String res = "";
 
+        int loseFrames = 0;
         for(int i = startFrame + duration, counter = 1; ; i+=duration, counter++){
             if(counter > num - 1){
                 break;
@@ -318,15 +320,22 @@ public class QRCodeUtil {
                 String temp = null;
                 try {
                     temp = decode(tempFile);
-                    res = res + temp;
                     System.out.println("Frame " + i + " with message: " + temp);
                 } catch (Exception e){
+                    byte[] t = new byte[QRBasedVideoEncoder.MAXLEN];
+                    for (int j = 0; j < t.length; j++) {
+                        t[j] = '0';
+                    }
+                    temp = new String(t);
+                    loseFrames++;
                     System.out.println("Frame " + i + " lose");
                 }
+                res = res + temp;
                 continue;
             }
             break;
         }
+        System.out.println(loseFrames + " frames lose.");
         return res.getBytes();
     }
 
