@@ -2,6 +2,7 @@ package com.saviour.mailman.video;
 
 import com.saviour.mailman.tool.FFmpegUtil;
 import com.saviour.mailman.tool.PictureUtil;
+import com.saviour.mailman.tool.QRCodeUtil;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -151,7 +152,22 @@ public class SimpleVideoLayer {
                 e.printStackTrace();
             }
 
-            if(result.contains("frames with")){
+            //System.out.println(result);
+
+            if(result.contains("frames") && result.contains("fps")){
+
+                File tFile = new File(workplace + File.separator + imagePrefix + (i + 1) + ".jpg");
+                BufferedImage image2 = null;
+                try {
+                    image2 = ImageIO.read(tFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (!betterThanNext(image, image2)) {
+                    i++;
+                }
+
+                result = result.replace("wlth", "with");
                 String[] t = result.split("[0-9]+ frames with .+ fps");
                 if(t.length == 1) {
                     result = result.substring(0, result.indexOf(t[0]));
@@ -217,6 +233,20 @@ public class SimpleVideoLayer {
         return table;
     }
 
+    private Boolean betterThanNext(BufferedImage image, BufferedImage image2) {
+        int sum = 0;
+        int sum2 = 0;
+        for (int y = image.getHeight() / 3; y < image.getHeight() / 3 * 2; y++) {
+            for (int x = image.getWidth() / 3; x < image.getWidth() / 3 * 2; x++) {
+                int gray = pictureUtil.calGray(image.getRGB(x, y));
+                int gray2 = pictureUtil.calGray(image2.getRGB(x, y));
+                sum += gray;
+                sum2 += gray2;
+            }
+        }
+        return sum > sum2 ? true : false;
+    }
+
     private Boolean detectPreamble(BufferedImage image){
         int sum = 0;
         for (int y = image.getHeight() / 3; y < image.getHeight() / 3 * 2; y++) {
@@ -235,6 +265,15 @@ public class SimpleVideoLayer {
     }
 
     public static void main(String[] args) throws IOException {
-
+        File tempFile = tempFile = new File("D:/OTHER/test4cn/Mailman/tmp27.jpg");
+        if(tempFile.exists()){
+            String temp = null;
+            try {
+                temp = QRCodeUtil.decode(tempFile);
+                System.out.println("Frame" + " with message: " + temp);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 }

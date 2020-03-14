@@ -33,12 +33,12 @@ public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
         /**
          * step1: generate pictures
          */
-        qrCodeUtil.generatePictures(new String(srcByte), QRBasedVideoEncoder.MAXLEN, root, PICTUREPREFIX);
+        qrCodeUtil.generatePictures(new String(srcByte), QRBasedVideoEncoder.maxLength, root, PICTUREPREFIX);
 
         /**
          * step2: pictures -> video
          */
-        int numOfPictures =  ((new String(srcByte).length() + 1) / QRBasedVideoEncoder.MAXLEN + 1);
+        int numOfPictures =  ((new String(srcByte).length() + 1) / QRBasedVideoEncoder.maxLength + 1);
         videoLayer.compose(fps, numOfPictures, root, PICTUREPREFIX, false);
 
         /**

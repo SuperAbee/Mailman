@@ -1,6 +1,7 @@
 package com.saviour.mailman.web;
 
 import com.saviour.mailman.decoder.SimpleVideoDecoder;
+import com.saviour.mailman.encoder.QRBasedVideoEncoder;
 import com.saviour.mailman.encoder.SimpleVideoEncoder;
 import com.saviour.mailman.tool.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +45,17 @@ public class CoderController {
     public ModelAndView encode(@RequestParam("file") MultipartFile srcFile,
                                @RequestParam("path") String path,
                                @RequestParam("fps") int fps,
+                               @RequestParam("rate") int rate,
                                @RequestParam(value = "version", defaultValue = "1") int version) throws Exception {
         /**
          * step1: preparation
          */
         File file = fileUtil.multiPartFile2File(srcFile);
         byte[] bytes = fileUtil.read(file);
+        /**
+         * DANGEROUS !!!
+         */
+        QRBasedVideoEncoder.maxLength = rate / 80;
 
         /**
          * step2: initialize encoder

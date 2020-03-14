@@ -18,7 +18,7 @@ public class TestFrameSwitch {
         FFmpegUtil fFmpegUtil = new FFmpegUtil();
         //fFmpegUtil.generateVideo("D:/OTHER/test4cn/Mailman/test-w.mp4",30, "image-w");
 
-        fFmpegUtil.generatePictures("D:/OTHER/test4cn/Mailman/test-w-captured.mp4", "image-w");
+        //fFmpegUtil.generatePictures("D:/OTHER/test4cn/Mailman/hand-test.mp4", "hand-test");
     }
 
     public static String generateWithWhite() {
