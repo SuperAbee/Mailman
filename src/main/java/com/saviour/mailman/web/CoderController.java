@@ -104,6 +104,7 @@ public class CoderController {
          * step3: write to file
          */
         String status = fileUtil.write(result, path);
+        file.delete();
 
         /**
          * step4: return status
