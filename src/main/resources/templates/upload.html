@@ -8,8 +8,11 @@
 <form method="post" action="/encode" enctype="multipart/form-data">
     <input type="file" name="file"><br>
     path:<input type="text" name="path"><br>
-    length of video:<input type="number" name="length"><br>
-    <input type="submit" value="Upload">
+    fps of video:<input type="number" name="fps"><br>
+    rate(bps):<input type="text" name="rate"><br>
+    <input type="submit" value="Upload"><br>
+    tip: 40000, 32000 or any rate can be divided exactly by 80 is recommended, not higher than 40000
+
 </form>
 <br>
 <br>

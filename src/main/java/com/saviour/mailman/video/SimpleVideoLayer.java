@@ -1,9 +1,8 @@
 package com.saviour.mailman.video;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import com.saviour.mailman.tool.FFmpegUtil;
 import com.saviour.mailman.tool.PictureUtil;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.saviour.mailman.tool.QRCodeUtil;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -19,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.Buffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public class SimpleVideoLayer {
 
     private String generateFirstFrame(int flag, int numOfPictures, String workplace, String imagePrefix) {
         // with 1 plus head frame
-        String strFlag = (numOfPictures + 1) + " frames with " + flag + "fps";
+        String strFlag = (numOfPictures + 1) + " frames with " + flag + " fps";
         BufferedImage tempImage;
         try {
             tempImage = ImageIO.read(new File(workplace + File.separator + imagePrefix + "1.jpg"));
@@ -88,7 +88,7 @@ public class SimpleVideoLayer {
         String path = workplace + '/' + videoName;
         ffmpegUtil.generatePictures(path, imagePrefix);
         try {
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -115,7 +115,6 @@ public class SimpleVideoLayer {
         path = path + "tessdata";
         try {
             path = URLDecoder.decode(path, "UTF-8");
-            //System.out.println(path);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -123,8 +122,29 @@ public class SimpleVideoLayer {
         instance.setDatapath(path);
         instance.setLanguage("eng");
         long startTime = System.currentTimeMillis();
-        for (int i = 1; i < 30; i++) {
+        for (int i = 1; i < 120; i++) {
+
             File file = new File(workplace + File.separator + imagePrefix + i + ".jpg");
+            if (!file.exists()){
+                break;
+            }
+
+            /*
+             * locate preamble
+             */
+            BufferedImage image = null;
+            try {
+                image = ImageIO.read(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (!detectPreamble(image)) {
+                continue;
+            }
+
+            /*
+             * detect header frame
+             */
             String result = null;
             try {
                 result =  instance.doOCR(file).toLowerCase();
@@ -132,20 +152,53 @@ public class SimpleVideoLayer {
                 e.printStackTrace();
             }
 
-            String[] values = result.split(" frames with ");
-            if(values.length > 1){
+            //System.out.println(result);
+
+            if(result.contains("frames") && result.contains("fps")){
+
+                File tFile = new File(workplace + File.separator + imagePrefix + (i + 1) + ".jpg");
+                BufferedImage image2 = null;
+                try {
+                    image2 = ImageIO.read(tFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (!betterThanNext(image, image2)) {
+                    i++;
+                }
+
+                result = result.replace("wlth", "with");
+                String[] t = result.split("[0-9]+ frames with .+ fps");
+                if(t.length == 1) {
+                    result = result.substring(0, result.indexOf(t[0]));
+                } else {
+                    result = result.substring(t[0].length(), result.indexOf(t[1]));
+                }
+
+                String[] values = result.split(" frames with ");
+
                 long endTime = System.currentTimeMillis();
                 /*
                  * example: 100 frames with 10fps
                  */
                 byte[] frames = values[0].getBytes();
-                byte[] fps = values[1].split("fps")[0].getBytes();
+                byte[] fps = values[1].split(" fps")[0].getBytes();
+                if(fps[0] == 39){
+                    byte[] tb = new byte[fps.length - 1];
+                    for (int j = 1; j < fps.length; j++) {
+                        tb[j-1] = fps[j];
+                    }
+                    fps = tb;
+                }
                 for (int j = 0; j < frames.length; j++) {
                     if(frames[j] == 73 || frames[j] == 108){
                         frames[j] = 49;
                     }
                     if(frames[j] == 79 || frames[j] == 111){
                         frames[j] = 48;
+                    }
+                    if(frames[j] == 83 || frames[j] == 115){
+                        frames[j] = 53;
                     }
                 }
                 for (int j = 0; j < fps.length; j++) {
@@ -155,13 +208,19 @@ public class SimpleVideoLayer {
                     if(fps[j] == 79 || fps[j] == 111){
                         fps[j] = 48;
                     }
+                    if(fps[j] == 83 || fps[j] == 115){
+                        fps[j] = 53;
+                    }
                 }
                 String strFPS = new String(fps);
                 String strFrames = new String(frames);
 
                 System.out.println("First frame detecting duration：" + (endTime - startTime) + "ms");
-                System.out.println("First frame: " + i);
-                System.out.println("Frames: " + strFrames);
+                /*
+                 * plus 1 to choose the stablest frame
+                 */
+                System.out.println("First frame: " + (i));
+                System.out.println("Frames: " + strFrames + ", including 1 header frame");
                 System.out.println("FPS: " + strFPS);
                 table.replace("fps", Integer.valueOf(strFPS));
                 table.replace("firstFrame", i);
@@ -169,20 +228,52 @@ public class SimpleVideoLayer {
                 return table;
             }
         }
+        System.out.println("First frame not found.");
 
         return table;
     }
 
-    public static void main(String[] args) {
-        SimpleVideoLayer videoLayer = new SimpleVideoLayer();
-        //videoLayer.generateFirstFrame(10, 100, "D:/OTHER/test4cn", "logo");
-        //Map<String, Integer> res = videoLayer.detectFirstFrame("D:/OTHER/test4cn", "logo");
-        //System.out.println("fps: "  + res.get("fps") + "  "
-        //       + "frames: " + res.get("frames") + "  "
-        //        + "firstFrame: " + res.get("firstFrame"));
-        //String path = "/D:/Serious/Courses/Computer%20Networking/Mailman/target/mailman-0.0.1-SNAPSHOT.jar!/BOOT-INF/classes!/";
-        String path = videoLayer.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-        String[] dir = path.split("/mailman-.+-SNAPSHOT\\.jar");
-        System.out.println(dir[0]);
+    private Boolean betterThanNext(BufferedImage image, BufferedImage image2) {
+        int sum = 0;
+        int sum2 = 0;
+        for (int y = image.getHeight() / 3; y < image.getHeight() / 3 * 2; y++) {
+            for (int x = image.getWidth() / 3; x < image.getWidth() / 3 * 2; x++) {
+                int gray = pictureUtil.calGray(image.getRGB(x, y));
+                int gray2 = pictureUtil.calGray(image2.getRGB(x, y));
+                sum += gray;
+                sum2 += gray2;
+            }
+        }
+        return sum > sum2 ? true : false;
+    }
+
+    private Boolean detectPreamble(BufferedImage image){
+        int sum = 0;
+        for (int y = image.getHeight() / 3; y < image.getHeight() / 3 * 2; y++) {
+            for (int x = image.getWidth() / 3; x < image.getWidth() / 3 * 2; x++) {
+                int gray = pictureUtil.calGray(image.getRGB(x, y));
+                if (gray > 128) {
+                    sum++;
+                }
+            }
+        }
+        if ((double) sum / (image.getWidth() / 3 * image.getHeight() / 3) < 0.7) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        File tempFile = tempFile = new File("D:/OTHER/test4cn/Mailman/tmp27.jpg");
+        if(tempFile.exists()){
+            String temp = null;
+            try {
+                temp = QRCodeUtil.decode(tempFile);
+                System.out.println("Frame" + " with message: " + temp);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 }

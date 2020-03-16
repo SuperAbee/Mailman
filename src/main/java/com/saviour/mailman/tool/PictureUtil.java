@@ -57,8 +57,12 @@ public class PictureUtil {
     }
 
     public void deletePictures(String root, String prefix) {
+        File image = new File(root + File.separator + prefix + 0 + ".jpg");
+        if(image.exists()){
+            image.delete();
+        }
         for(int i = 1; ; i++){
-            File image = new File(root + File.separator + prefix + i + ".jpg");
+            image = new File(root + File.separator + prefix + i + ".jpg");
             if(image.exists()){
                 image.delete();
                 continue;

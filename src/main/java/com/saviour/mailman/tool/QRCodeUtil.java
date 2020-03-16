@@ -1,15 +1,7 @@
 package com.saviour.mailman.tool;
 
 
-import java.awt.BasicStroke;
-
-import java.awt.Graphics;
-
-import java.awt.Graphics2D;
-
-import java.awt.Image;
-
-import java.awt.Shape;
+import java.awt.*;
 
 import java.awt.geom.RoundRectangle2D;
 
@@ -43,6 +35,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.saviour.mailman.encoder.QRBasedVideoEncoder;
 import org.springframework.stereotype.Component;
 
 
@@ -55,7 +48,7 @@ public class QRCodeUtil {
 
     // 二维码尺寸
 
-    private static final int QRCODE_SIZE = 300;
+    private static final int QRCODE_SIZE = 500;
 
     // LOGO宽度
 
@@ -309,6 +302,7 @@ public class QRCodeUtil {
         File tempFile = null;
         String res = "";
 
+        int loseFrames = 0;
         for(int i = startFrame + duration, counter = 1; ; i+=duration, counter++){
             if(counter > num - 1){
                 break;
@@ -316,22 +310,55 @@ public class QRCodeUtil {
             tempFile = new File(root + File.separator + prefix + i + ".jpg");
             if(tempFile.exists()){
                 String temp = null;
+
+                resize(tempFile);
+                tempFile = new File(root + File.separator + prefix + i + ".jpg");
+
                 try {
                     temp = decode(tempFile);
-                    res = res + temp;
-                    System.out.println("Frame" + i + " with message: " + temp);
+                    System.out.println("Frame " + i + " with message: " + temp);
                 } catch (Exception e){
+                    byte[] t = new byte[QRBasedVideoEncoder.maxLength];
+                    for (int j = 0; j < t.length; j++) {
+                        t[j] = '0';
+                    }
+                    temp = new String(t);
+                    loseFrames++;
                     System.out.println("Frame " + i + " lose");
                 }
+                res = res + temp;
                 continue;
             }
             break;
         }
+        System.out.println(loseFrames + " frames lose.");
         return res.getBytes();
     }
 
+    public void resize(File tempFile) throws IOException {
+        BufferedImage img = ImageIO.read(tempFile);
+        int w = img.getWidth();
+        int h = img.getHeight();
+        int m = w / 500;
+        int hdv = h - w > 0 ? (h - w) : 0;
+        int wdv = w - h > 0 ? (w - h) : 0;
+
+        img = img.getSubimage(wdv / 2, hdv / 2, w - wdv, h - hdv);
+        w = w - wdv;
+        h = h - hdv;
+
+        BufferedImage dimg = new BufferedImage(w / m, h / m, img.getType());
+        Graphics2D g = dimg.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(img, 0, 0, w / m, h / m,
+                0, 0, w, h, null);
+        g.dispose();
+        ImageIO.write(dimg, "jpg", tempFile);
+    }
+
     public static void main(String[] args) throws Exception {
-        String res = decode("D:/OTHER/test4cn/Mailman/tmp12.jpg");
+        File file = new File("D:/OTHER/test4cn/Mailman/bug1.jpg");
+        String res = QRCodeUtil.decode(file);
         System.out.println(res);
     }
 }

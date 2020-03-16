@@ -1,6 +1,7 @@
 package com.saviour.mailman.web;
 
 import com.saviour.mailman.decoder.SimpleVideoDecoder;
+import com.saviour.mailman.encoder.QRBasedVideoEncoder;
 import com.saviour.mailman.encoder.SimpleVideoEncoder;
 import com.saviour.mailman.tool.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,14 @@ public class CoderController {
     @Autowired
     private SimpleVideoDecoder decoder;
 
+    @Qualifier("qrBasedVideoEncoder")
+    @Autowired
+    private SimpleVideoEncoder fastEncoder;
+
+    @Qualifier("qrBasedVideoDecoder")
+    @Autowired
+    private SimpleVideoDecoder fastDecoder;
+
     @RequestMapping("/")
     public ModelAndView index(){
         return new ModelAndView("upload.html");
@@ -35,22 +44,37 @@ public class CoderController {
     @RequestMapping("/encode")
     public ModelAndView encode(@RequestParam("file") MultipartFile srcFile,
                                @RequestParam("path") String path,
-                               @RequestParam("length") int lengthOfVideo) throws Exception {
+                               @RequestParam("fps") int fps,
+                               @RequestParam("rate") int rate,
+                               @RequestParam(value = "version", defaultValue = "1") int version) throws Exception {
         /**
          * step1: preparation
          */
         File file = fileUtil.multiPartFile2File(srcFile);
         byte[] bytes = fileUtil.read(file);
+        /**
+         * DANGEROUS !!!
+         */
+        QRBasedVideoEncoder.maxLength = rate / 80;
 
         /**
          * step2: initialize encoder
          */
-        encoder.load(bytes, lengthOfVideo, path);
+        encoder.load(bytes, fps, path);
 
         /**
          * step3: encode
          */
-        String status = encoder.encode();
+        String status = "OK";
+        switch (version){
+            case 1:
+                status = encoder.encode();
+                break;
+            case 2:
+                status = fastEncoder.encode();
+                break;
+            default:
+        }
 
         /**
          * step4: return result
@@ -62,7 +86,8 @@ public class CoderController {
 
     @RequestMapping("/decode")
     public ModelAndView decode(@RequestParam("file") MultipartFile srcFile,
-                               @RequestParam("path") String path) throws Exception {
+                               @RequestParam("path") String path,
+                               @RequestParam(value = "version", defaultValue = "1") int version) throws Exception {
         /**
          * step1: initialize decoder
          */
