@@ -52,7 +52,6 @@ public class CoderController {
          */
         File file = fileUtil.multiPartFile2File(srcFile);
         byte[] bytes = fileUtil.read(file);
-        file.delete();
         /**
          * DANGEROUS !!!
          */
@@ -76,6 +75,8 @@ public class CoderController {
                 break;
             default:
         }
+
+        file.delete();
 
         /**
          * step4: return result
