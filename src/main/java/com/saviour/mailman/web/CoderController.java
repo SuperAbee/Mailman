@@ -55,7 +55,7 @@ public class CoderController {
         /**
          * DANGEROUS !!!
          */
-        QRBasedVideoEncoder.maxLength = rate / 80;
+        QRBasedVideoEncoder.maxLength = rate / (8 * fps);
 
         /**
          * step2: initialize encoder
