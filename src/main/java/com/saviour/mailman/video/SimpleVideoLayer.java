@@ -149,7 +149,7 @@ public class SimpleVideoLayer {
             try {
                 result =  instance.doOCR(file).toLowerCase();
             } catch (TesseractException e) {
-                e.printStackTrace();
+                continue;
             }
 
             //System.out.println(result);
@@ -213,6 +213,11 @@ public class SimpleVideoLayer {
                     }
                 }
                 String strFPS = new String(fps);
+                try {
+                    Integer.valueOf(strFPS);
+                } catch (NumberFormatException e) {
+                    strFPS = "10";
+                }
                 String strFrames = new String(frames);
 
                 System.out.println("First frame detecting duration：" + (endTime - startTime) + "ms");
