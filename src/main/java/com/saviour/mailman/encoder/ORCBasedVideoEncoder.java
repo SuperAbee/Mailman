@@ -10,7 +10,7 @@ import static java.lang.Thread.sleep;
 
 @Component("orcBasedVideoEncoder")
 public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
-    private static final String PICTUREPREFIX = "tmp";
+    private String picturePrefix;
 
     @Autowired
     private QRCodeUtil qrCodeUtil;
@@ -23,23 +23,26 @@ public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
 
     @Override
     public String encode() throws Exception {
+        picturePrefix = path.substring(root.length()) + "tmp";
+
         /**
          * The size of bytes bigger than 10MB, switch to fast mode
          */
-        if(srcByte.length >= 1024 * 1024 * 10){
+        if(srcByte.length >= 1024 * 1024 * 20){
             return fastEncode();
         }
 
         /**
          * step1: generate pictures
          */
-        qrCodeUtil.generatePictures(new String(srcByte), QRBasedVideoEncoder.maxLength, root, PICTUREPREFIX);
+        String message = QRCodeUtil.byteArrayToHexStr(srcByte);
+        qrCodeUtil.generatePictures(message, QRBasedVideoEncoder.maxLength, root, picturePrefix);
 
         /**
          * step2: pictures -> video
          */
-        int numOfPictures =  ((new String(srcByte).length() + 1) / QRBasedVideoEncoder.maxLength + 1);
-        videoLayer.compose(fps, numOfPictures, root, PICTUREPREFIX, false);
+        int numOfPictures =  ((message.length() + 1) / QRBasedVideoEncoder.maxLength + 1);
+        videoLayer.compose(fps, numOfPictures, root, path, picturePrefix, false);
 
         /**
          * step3: remove pictures
@@ -53,7 +56,7 @@ public class ORCBasedVideoEncoder  extends SimpleVideoEncoder {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        pictureUtil.deletePictures(root, PICTUREPREFIX);
+        pictureUtil.deletePictures(root, picturePrefix);
 
         return "OK";
     }

@@ -12,6 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
@@ -48,15 +52,15 @@ public class QRCodeUtil {
 
     // 二维码尺寸
 
-    private static final int QRCODE_SIZE = 500;
+    private static final int QRCODE_SIZE = 1000;
 
     // LOGO宽度
 
-    private static final int WIDTH = 60;
+    private static final int WIDTH = 0;
 
     // LOGO高度
 
-    private static final int HEIGHT = 60;
+    private static final int HEIGHT = 0;
 
 
     private static BufferedImage createImage(String content, String imgPath, boolean needCompress) throws Exception {
@@ -332,7 +336,7 @@ public class QRCodeUtil {
             break;
         }
         System.out.println(loseFrames + " frames lose.");
-        return res.getBytes();
+        return QRCodeUtil.hexStrToByteArray(res);
     }
 
     public void resize(File tempFile) throws IOException {
@@ -356,10 +360,45 @@ public class QRCodeUtil {
         ImageIO.write(dimg, "jpg", tempFile);
     }
 
+    public static String byteArrayToHexStr(byte[] byteArray) {
+        if (byteArray == null){
+            return null;
+        }
+        char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[byteArray.length * 2];
+        for (int j = 0; j < byteArray.length; j++) {
+            int v = byteArray[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
+    public static byte[] hexStrToByteArray(String str)
+    {
+        if (str == null) {
+            return null;
+        }
+        if (str.length() == 0) {
+            return new byte[0];
+        }
+        byte[] byteArray = new byte[str.length() / 2];
+        for (int i = 0; i < byteArray.length; i++){
+            String subStr = str.substring(2 * i, 2 * i + 2);
+            byteArray[i] = ((byte)Integer.parseInt(subStr, 16));
+        }
+        return byteArray;
+    }
+
     public static void main(String[] args) throws Exception {
-        File file = new File("D:/OTHER/test4cn/Mailman/bug1.jpg");
-        String res = QRCodeUtil.decode(file);
-        System.out.println(res);
+
+        byte[] bs = new byte[500];
+        for (int i = 0; i < 500; i++) {
+            bs[i] = (byte)-i;
+        }
+        String ss =  byteArrayToHexStr(bs);
+
+        //encode(ss, "D:/OTHER/test4cn/Mailman/test1.jpg");
     }
 }
 

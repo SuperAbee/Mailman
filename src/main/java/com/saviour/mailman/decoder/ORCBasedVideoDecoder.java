@@ -57,4 +57,33 @@ public class ORCBasedVideoDecoder extends SimpleVideoDecoder {
         fileUtil.delete(tmpVideoPath);
         return message;
     }
+
+    @Override
+    public byte[] decode4test(String video) throws Exception {
+
+        int flag = video.lastIndexOf("/");
+        String videoRoot = video.substring(0, flag);
+        String videoName = video.substring(flag + 1);
+        String picPrefix = video.split("/")[video.split("/").length - 1] + PICTUREPREFIX;
+
+        /*
+         * step2: video -> picture
+         */
+        Map<String, Integer> result = videoLayer.decompose(videoRoot, picPrefix, videoName);
+        int fps = result.get("fps");
+        int startFrame = result.get("firstFrame");
+        int num = result.get("frames");
+
+        /*
+         * step3: picture -> byte,
+         */
+        int duration = 30 / fps;
+        byte[] message = qrCodeUtil.getBytesFromPictures(videoRoot, picPrefix, startFrame, duration, num);
+
+        /*
+         * step4: delete temperate files and pictures
+         */
+        pictureUtil.deletePictures(videoRoot, picPrefix);
+        return message;
+    }
 }

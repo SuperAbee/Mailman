@@ -1,5 +1,6 @@
 package com.saviour.mailman.encoder;
 
+import com.google.zxing.qrcode.encoder.QRCode;
 import com.saviour.mailman.tool.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,7 @@ import static java.lang.Thread.sleep;
 public class QRBasedVideoEncoder extends SimpleVideoEncoder {
 
     private static final String PICTUREPREFIX = "tmp";
-    public static int maxLength = 500;
+    public static int maxLength = 800;
 
     @Autowired
     private QRCodeUtil qrCodeUtil;
@@ -33,7 +34,7 @@ public class QRBasedVideoEncoder extends SimpleVideoEncoder {
         /**
          * step1: generate pictures
          */
-        qrCodeUtil.generatePictures(new String(srcByte), maxLength, root, PICTUREPREFIX);
+        qrCodeUtil.generatePictures(QRCodeUtil.byteArrayToHexStr(srcByte), maxLength, root, PICTUREPREFIX);
 
         /**
          * step2: pictures -> video
@@ -48,7 +49,7 @@ public class QRBasedVideoEncoder extends SimpleVideoEncoder {
              * This thread sleep 10ms per pictureNumber to delete pictures,
              * so that ffmpeg has enough time to combine videos.
              */
-            sleep(2000);
+            sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

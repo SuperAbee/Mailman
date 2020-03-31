@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -32,9 +33,9 @@ public class VideoLayerController {
                                 String workplace, String imagePrefix,
                                 Boolean deleteImages) {
 
-        String result = videoLayer.compose(fps, numOfPictures, workplace, imagePrefix, deleteImages);
+        //String result = videoLayer.compose(fps, numOfPictures, workplace, imagePrefix, deleteImages);
 
-        return result;
+        return null;
     }
 
     /**
@@ -45,7 +46,7 @@ public class VideoLayerController {
      * @return fps, frames, first frame.
      */
     @RequestMapping("/video/decompose")
-    public String decompose(String workplace, String imagePrefix, String videoName){
+    public String decompose(String workplace, String imagePrefix, String videoName) throws IOException {
 
         Map<String, Integer> result = videoLayer.decompose(workplace, imagePrefix, videoName);
 

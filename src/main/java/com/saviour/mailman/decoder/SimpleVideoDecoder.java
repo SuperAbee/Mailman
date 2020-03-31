@@ -206,4 +206,8 @@ public class SimpleVideoDecoder {
         }
         return bitsOfFPS;
     }
+
+    public byte[] decode4test(String path) throws Exception {
+        return null;
+    }
 }

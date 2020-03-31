@@ -3,7 +3,7 @@ package com.saviour.mailman.tool;
 import org.springframework.stereotype.Component;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class FFmpegUtil {
         }
     }
 
-    public void generatePictures(String path, String prefix) {
+    public void generatePictures(String path, String prefix) throws IOException {
         int index = path.lastIndexOf("/");
         String root = path.substring(0, index);
 
@@ -44,8 +44,10 @@ public class FFmpegUtil {
         builder.command(commend);
         try {
             builder.start();
-        } catch (IOException e) {
+            Thread.sleep(20000);
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
+
 }

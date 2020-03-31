@@ -66,7 +66,7 @@ public class SimpleVideoEncoder {
         /**
          * The size of bytes bigger than 10MB, switch to fast mode
          */
-        if(srcByte.length >= 1024 * 1024 * 10){
+        if(srcByte.length >= 1024 * 1024 * 20){
             return fastEncode();
         }
 

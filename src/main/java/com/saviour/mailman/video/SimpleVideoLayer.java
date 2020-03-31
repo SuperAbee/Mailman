@@ -34,9 +34,8 @@ public class SimpleVideoLayer {
     @Autowired
     private PictureUtil pictureUtil;
 
-    public String compose(int fps, int numOfPictures, String workplace, String imagePrefix, Boolean deleteImages){
+    public String compose(int fps, int numOfPictures, String workplace, String path, String imagePrefix, Boolean deleteImages){
         generateFirstFrame(fps, numOfPictures, workplace, imagePrefix);
-        String path = workplace + "/" + imagePrefix + "-" + fps + "fps.mp4";
         ffmpegUtil.generateVideo(path, fps, imagePrefix);
         if (deleteImages) {
             pictureUtil.deletePictures(workplace, imagePrefix);
@@ -84,14 +83,9 @@ public class SimpleVideoLayer {
         return "OK";
     }
 
-    public Map<String, Integer> decompose(String workplace, String imagePrefix, String videoName) {
+    public Map<String, Integer> decompose(String workplace, String imagePrefix, String videoName) throws IOException {
         String path = workplace + '/' + videoName;
         ffmpegUtil.generatePictures(path, imagePrefix);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         return detectFirstFrame(workplace, imagePrefix);
     }
